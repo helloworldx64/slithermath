@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#0a1020" />
+<title>כפל רויאל</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- Loading screen -->
+  <div id="loading" class="overlay">
+    <div class="loading-box">
+      <div class="spinner"></div>
+      <div id="loadingText" class="loading-text">טוען...</div>
+    </div>
+  </div>
+
+  <!-- Start Menu -->
+  <div id="menu" class="overlay hidden">
+    <div class="panel">
+      <div class="profile-bar">
+        <div class="profile-left">
+          <div class="profile-level-wrap">
+            <span class="profile-level-label">רמה</span>
+            <span id="profileLevel" class="profile-level">1</span>
+          </div>
+          <div class="profile-xp">
+            <div class="xp-bar-bg"><div id="profileBar" class="xp-bar"></div></div>
+            <div id="profileXp" class="xp-text">0 / 250</div>
+          </div>
+        </div>
+        <div class="profile-btns">
+          <button id="shopBtn" class="icon-btn" title="חנות">🛒</button>
+          <button id="statsBtn" class="icon-btn" title="סטטיסטיקה">📊</button>
+          <button id="settingsBtn" class="icon-btn" title="הגדרות">⚙️</button>
+        </div>
+      </div>
+
+      <h1 class="logo">כפל <span>רויאל</span></h1>
+      <p class="tag">תרגול כפל בסגנון משחק אקשן</p>
+
+      <div class="name-row">
+        <input id="nameInput" type="text" maxlength="16" placeholder="כינוי" />
+        <input id="lenInput" type="number" min="0" max="50000" placeholder="אורך התחלתי (0 = ברירת מחדל)" />
+      </div>
+
+      <div class="server-wrap">
+        <div class="section-label">בחר שרת</div>
+        <div id="serverSelect" class="server-list"></div>
+      </div>
+
+      <div class="skins-wrap">
+        <div class="section-label">בחר עיצוב</div>
+        <div id="skins" class="skins"></div>
+      </div>
+
+      <button id="playBtn" class="btn primary big">שחק</button>
+      <p class="hint">גרור לניווט · לחץ לדש · ענה נכון על כפל = טורבו</p>
+    </div>
+  </div>
+
+  <!-- Shop -->
+  <div id="shop" class="overlay hidden">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>חנות עיצובים</h2>
+        <button id="shopClose" class="close-btn">✕</button>
+      </div>
+      <p class="tag">פתח עיצובים חדשים על ידי עליית רמה ותשובות נכונות</p>
+      <div id="shopSkins" class="skins shop-grid"></div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div id="statsScreen" class="overlay hidden">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>סטטיסטיקה</h2>
+        <button id="statsClose" class="close-btn">✕</button>
+      </div>
+      <div id="statsBox" class="stats-box"></div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div id="settings" class="overlay hidden">
+    <div class="panel">
+      <div class="panel-header">
+        <h2>הגדרות</h2>
+        <button id="settingsClose" class="close-btn">✕</button>
+      </div>
+      <div class="settings-list">
+        <label class="setting-row"><span>צליל</span><input id="soundToggle" type="checkbox" class="switch" /></label>
+        <label class="setting-row"><span>מוזיקה</span><input id="musicToggle" type="checkbox" class="switch" /></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- In-Game HUD -->
+  <div id="hud" class="hidden">
+    <div class="hud-tl">
+      <div class="stat"><span class="lbl">ניקוד</span><span id="hudScore" class="val">0</span></div>
+      <div class="stat"><span class="lbl">אורך</span><span id="hudLen" class="val">0</span></div>
+      <div class="stat"><span class="lbl">רמה</span><span id="hudLevel" class="val">1</span></div>
+      <div class="stat streak"><span id="hudStreak" class="val"></span></div>
+      <div class="stat small"><span class="lbl">FPS</span><span id="fps" class="val">0</span></div>
+    </div>
+    <div class="hud-tr">
+      <div class="board-title">טבלת מובילים</div>
+      <ol id="hudBoard"></ol>
+    </div>
+    <button id="pauseBtn" class="pause-btn">⏸</button>
+  </div>
+
+  <!-- Math Question Overlay -->
+  <div id="mathOverlay" class="hidden">
+    <div class="math-card">
+      <div class="math-timer"><div id="mathTimerBar" class="math-timer-bar"></div></div>
+      <div id="mathQuestion" class="math-question"></div>
+      <div id="mathOptions" class="math-options"></div>
+      <div id="mathFeedback" class="math-feedback"></div>
+    </div>
+  </div>
+
+  <!-- Turbo flash -->
+  <div id="turboFlash" class="turbo-flash"></div>
+
+  <!-- Pause -->
+  <div id="pause" class="overlay hidden">
+    <div class="panel small-panel">
+      <h2>השהה</h2>
+      <button id="resumeBtn" class="btn primary big">המשך</button>
+      <button id="quitBtn" class="btn ghost">יציאה לתפריט</button>
+    </div>
+  </div>
+
+  <!-- Death Screen -->
+  <div id="dead" class="overlay hidden">
+    <div class="panel">
+      <h2 class="dead-title">נהרגת!</h2>
+      <div class="dead-stats">
+        <div class="ds"><span>ניקוד סופי</span><b id="deadScore">0</b></div>
+        <div class="ds"><span>אורך</span><b id="deadLen">0</b></div>
+        <div class="ds"><span>מקום</span><b id="deadRank">0</b></div>
+      </div>
+      <div id="deadMath" class="dead-math"></div>
+      <button id="respawnBtn" class="btn primary big">שחק שוב</button>
+      <button id="backBtn" class="btn ghost">החלף עיצוב</button>
+    </div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/spatial.js"></script>
+  <script src="js/skins.js"></script>
+  <script src="js/names.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/account.js"></script>
+  <script src="js/math.js"></script>
+  <script src="js/food.js"></script>
+  <script src="js/snake.js"></script>
+  <script src="js/bot.js"></script>
+  <script src="js/camera.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
