@@ -161,9 +161,7 @@ const UI = {
       Audio.init(); Audio.click(); Audio.startMusic();
       const name = (document.getElementById('nameInput').value || '').trim() || 'שחקן';
       this.account.name = name;
-      const lenRaw = (document.getElementById('lenInput').value || '').trim();
-      const startLen = lenRaw ? Math.max(0, Math.min(50000, parseInt(lenRaw, 10) || 0)) : 0;
-      if (this.onPlay) this.onPlay(name, this.account.selectedSkin, startLen);
+      if (this.onPlay) this.onPlay(name, this.account.selectedSkin);
     });
     document.getElementById('respawnBtn').addEventListener('click', () => {
       Audio.click();
@@ -239,8 +237,27 @@ const UI = {
   showMathQuestion(q, timeLeftMs) {
     const ov = this.el.math;
     if (!ov) return;
-    document.getElementById('mathQuestion').innerHTML =
-      `<span class="mq-a">${q.a}</span> <span class="mq-op">×</span> <span class="mq-b">${q.b}</span> <span class="mq-eq">=</span> <span class="mq-q">?</span>`;
+    // Render the question based on operation type
+    const qEl = document.getElementById('mathQuestion');
+    const opSym = { multiply: '×', divide: '÷', missing: '×', square: '×', word: '' }[q.op] || '×';
+    let html;
+    if (q.op === 'word' && q.prompt) {
+      // word problem: show the Hebrew prompt, big and clear
+      html = `<div class="mq-word">${escapeHtml(q.prompt)}</div>`;
+    } else if (q.op === 'divide') {
+      // a ÷ b = ?
+      html = `<span class="mq-a">${q.a}</span> <span class="mq-op">÷</span> <span class="mq-b">${q.b}</span> <span class="mq-eq">=</span> <span class="mq-q">?</span>`;
+    } else if (q.op === 'missing') {
+      // a × ? = product
+      html = `<span class="mq-a">${q.a}</span> <span class="mq-op">×</span> <span class="mq-q">?</span> <span class="mq-eq">=</span> <span class="mq-b">${q.product}</span>`;
+    } else if (q.op === 'square') {
+      // a² = ?
+      html = `<span class="mq-a">${q.a}</span><span class="mq-op">²</span> <span class="mq-eq">=</span> <span class="mq-q">?</span>`;
+    } else {
+      // multiply: a × b = ?
+      html = `<span class="mq-a">${q.a}</span> <span class="mq-op">×</span> <span class="mq-b">${q.b}</span> <span class="mq-eq">=</span> <span class="mq-q">?</span>`;
+    }
+    qEl.innerHTML = html;
     const opts = document.getElementById('mathOptions');
     opts.innerHTML = '';
     q.options.forEach(opt => {

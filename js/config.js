@@ -1,11 +1,11 @@
 // Global configuration for "כפל רויאל" (Multiplication Royale) — a Hebrew math-learning slither game.
 const CONFIG = {
   WORLD_RADIUS: 14000,
-  FOOD_COUNT: 6000,
+  FOOD_COUNT: 8000,             // more food for faster growth
   FOOD_MIN_R: 3.2,
   FOOD_MAX_R: 9.5,
   FOOD_BIG_R: 14,
-  FOOD_BIG_CHANCE: 0.06,
+  FOOD_BIG_CHANCE: 0.08,        // more big orbs
   FOOD_SPACING: 55,
 
   // Snake growth / mass
@@ -16,28 +16,29 @@ const CONFIG = {
   HEAD_RADIUS_BASE: 11,
   RADIUS_PER_SCORE: 0.0065,
   RADIUS_MAX: 33,
-  LENGTH_PER_FOOD: 8.5,
-  BOOST_DRAIN_PER_SEC: 14,
+  LENGTH_PER_FOOD: 9.5,         // even easier growth
+  BOOST_DRAIN_PER_SEC: 11,      // cheaper boost
   BOOST_MIN_SCORE: 30,
   BOOST_SPEED_MULT: 2.18,
   BASE_SPEED: 210,
   TURN_RATE: 7.6,
-  BOOST_TURBO_MULT: 2.6,        // extra speed from answered-correctly turbo
-  TURBO_DURATION_MS: 2600,      // turbo boost after correct answer
+  BOOST_TURBO_MULT: 2.7,        // stronger turbo from correct answers
+  TURBO_DURATION_MS: 2800,      // longer turbo
 
-  // Bots
-  BOT_COUNT: 24,
+  // Bots — more + harder
+  BOT_COUNT: 28,
+  BOT_HARD_RATIO: 0.35,         // fraction of hard bots
 
-  // Math / progression
+  // Math / progression — more math, faster, harder
   MATH_MIN_TABLE: 2,
-  MATH_MAX_TABLE: 10,
-  MATH_TIME_LIMIT_MS: 9000,     // per-question timer; 0 = disabled
-  MATH_CORRECT_XP: 50,
-  MATH_STREAK_XP_BONUS: 12,     // extra XP per streak level
-  MATH_WRONG_PENALTY_MS: 1400,  // brief slow on wrong answer
-  MATH_WINDOW_FRAMES: 8,        // how often to show a question (scaled by score)
-  MATH_WINDOW_BASE: 1100,       // base score before first question
-  MATH_WINDOW_GROWTH: 1.55,     // each next question requires this factor more score
+  MATH_MAX_TABLE: 12,           // up to 12x12 tables now
+  MATH_TIME_LIMIT_MS: 8500,     // tighter timer
+  MATH_CORRECT_XP: 60,          // more XP per correct
+  MATH_STREAK_XP_BONUS: 16,     // bigger streak bonuses
+  MATH_WRONG_PENALTY_MS: 1200,  // brief slow on wrong answer
+  MATH_WINDOW_FRAMES: 8,
+  MATH_WINDOW_BASE: 550,        // first question comes FAST
+  MATH_WINDOW_GROWTH: 1.4,      // gentle growth so questions stay frequent
 
   // Servers (simulated zones)
   SERVERS: [

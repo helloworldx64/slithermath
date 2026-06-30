@@ -46,23 +46,12 @@ class World {
     }
   }
 
-  spawnPlayer(name, skin, startLength) {
+  spawnPlayer(name, skin) {
     const p = this._safeSpawnPoint();
     const s = new Snake({
       id: this.nextId++, name: name || 'You', skin,
       isBot: false, world: this, head: p, heading: Math.random() * TAU,
     });
-    const len = Math.max(0, Math.min(50000, startLength | 0));
-    if (len > 1) {
-      s.score = len; s.targetLength = len;
-      const dir = V2.fromAngle(s.heading);
-      s.points = [];
-      const pts = Math.max(48, len * 2.2);
-      for (let i = 0; i < pts; i++) {
-        s.points.push({ x: s.head.x - dir.x * i * CONFIG.SEGMENT_SPACING * 0.25,
-                        y: s.head.y - dir.y * i * CONFIG.SEGMENT_SPACING * 0.25 });
-      }
-    }
     s.invulnUntil = performance.now() + CONFIG.INVULN_MS;
     this.player = s;
     this.snakes.push(s);
@@ -84,10 +73,11 @@ class World {
   }
 
   fillBots() {
-    // Mix of difficulty tiers
+    // Mix of difficulty tiers — more hard bots for a tougher game
+    const hardR = CONFIG.BOT_HARD_RATIO || 0.3;
     while (this.snakes.filter(s => s.isBot && s.alive).length < CONFIG.BOT_COUNT) {
       const r = Math.random();
-      const tier = r < 0.5 ? 'normal' : r < 0.8 ? 'easy' : 'hard';
+      const tier = r < hardR ? 'hard' : r < hardR + 0.4 ? 'normal' : 'easy';
       this.spawnBot(tier);
     }
   }

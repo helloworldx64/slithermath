@@ -13,7 +13,6 @@ class Game {
     this.state = 'menu';
     this.playerName = account.name;
     this.playerSkinIdx = account.selectedSkin;
-    this.playerStartLength = 0;
     this.lastTime = 0;
     this.fps = 0; this._fpsAccum = 0; this._fpsCount = 0;
     this.paused = false;
@@ -24,7 +23,7 @@ class Game {
     this.world.fillBots();
 
     // Wire UI callbacks
-    UI.onPlay = (name, skinIdx, startLen) => this.start(name, skinIdx, startLen);
+    UI.onPlay = (name, skinIdx) => this.start(name, skinIdx);
     UI.onRespawn = () => this.respawn();
     UI.onQuit = () => this.quitToMenu();
     UI.onAnswer = (picked) => this._answerMath(picked);
@@ -43,27 +42,25 @@ class Game {
     this.camera.resize(w, h);
   }
 
-  start(name, skinIdx, startLength) {
+  start(name, skinIdx) {
     this.playerName = name || this.account.name;
     this.playerSkinIdx = skinIdx || 0;
-    this.playerStartLength = startLength || 0;
     if (this.world.player) {
       const i = this.world.snakes.indexOf(this.world.player);
       if (i >= 0) this.world.snakes.splice(i, 1);
     }
     this.world = new World(this.account.server);
     this.world.fillBots();
-    this.world.player = this.world.spawnPlayer(this.playerName, SKINS[this.playerSkinIdx], this.playerStartLength);
+    this.world.player = this.world.spawnPlayer(this.playerName, SKINS[this.playerSkinIdx]);
     this.math = new MathEngine(this.account);
     this.math.resetCooldown(this.world.player.score);
     this.camera.x = this.world.player.head.x;
     this.camera.y = this.world.player.head.y;
     this.state = 'playing';
     UI.hide('menu'); UI.hide('dead'); UI.hide('math'); UI.show('hud');
-    if (!this._tutorialShown && isMobile()) {
-      this._tutorialShown = true;
-    }
   }
+
+  respawn() { this.start(this.playerName, this.playerSkinIdx); }
 
   die() {
     const p = this.world.player;
@@ -119,14 +116,9 @@ class Game {
   _maybeSpawnMath() {
     const p = this.world.player;
     if (!p || !p.alive) return;
-    // Show a question only after the cooldown AND once a math orb is eaten.
-    // The orb eating is signaled via world.events; here we just check cooldown.
     const q = this.math.maybeAsk(p.score, 0);
     if (q) {
-      // Spawn a math orb for the player to grab; eating it opens the question.
-      // For simplicity in this build, we open the question immediately so kids
-      // aren't confused by the orb step.
-      UI.showMathQuestion(q, CONFIG.MATH_TIME_LIMIT_MS);
+      UI.showMathQuestion(q, q.timeLimit || CONFIG.MATH_TIME_LIMIT_MS);
       Audio.eatBig();
     }
   }
